@@ -1,5 +1,6 @@
 .eye-section {
-  height: 20%;
+  flex: 0 0 auto;
+  height: 140px; /* Fixed height for consistency */
   background-color: #1a1a2e; /* Dark eye area */
   display: flex;
   justify-content: center;
@@ -8,6 +9,7 @@
   border-bottom: 2px solid #0f0f1c;
   overflow: hidden;
   position: relative;
+  border-radius: 36px 36px 0 0; /* Match device curve */
 }
 
 .eye {

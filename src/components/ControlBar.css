@@ -1,11 +1,11 @@
 .control-bar {
-  height: 18%; /* Give slightly more room */
+  flex: 0 0 auto;
   background: linear-gradient(to top, #11111a, #1a1a2e);
   border-top: 1px solid rgba(255,255,255,0.08);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 16px 10px 24px 10px; /* Extra padding at bottom for rounded corner */
   box-sizing: border-box;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
   position: relative;
