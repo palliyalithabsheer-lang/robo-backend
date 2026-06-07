@@ -68,20 +68,21 @@
 /* ── Dynamic CENTER button ──────────────────────────────────────────────── */
 .select-btn {
   border: none;
-  border-radius: 28px;
-  padding: 12px 28px;
+  border-radius: 20px;
+  padding: 7px 16px;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   cursor: pointer;
-  min-width: 110px;
-  min-height: 52px;
+  min-width: 80px;
+  min-height: 34px;
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-transform: uppercase;
   display: flex;
   justify-content: center;
   align-items: center;
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  margin: auto; /* keeps it perfectly centered within its grid cell */
 }
 
 .select-btn:hover {
