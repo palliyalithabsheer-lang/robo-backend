@@ -1,74 +1,89 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { getDb } from './db/db';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import fs from 'fs';
 import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { schema } from './db/schema';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let uploadPath = 'uploads';
-    if (file.mimetype.startsWith('video/')) {
-      uploadPath = 'uploads/videos';
-    } else if (file.mimetype.startsWith('image/')) {
-      uploadPath = 'uploads/images';
-    }
-    cb(null, path.join(__dirname, '..', uploadPath));
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
-  }
+// ─── Cloudinary Configuration ─────────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const upload = multer({ storage });
+
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req: any, file: any) => {
+    const isVideo = file.mimetype.startsWith('video/');
+    return {
+      folder: isVideo ? 'robo/videos' : 'robo/images',
+      resource_type: isVideo ? 'video' : 'image',
+      allowed_formats: isVideo
+        ? ['mp4', 'mov', 'avi', 'mkv', 'webm']
+        : ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    };
+  },
+});
+
+const upload = multer({ storage: cloudinaryStorage });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ─── Initialize Database on startup ──────────────────────────────────────────
-import { schema } from './db/schema';
 async function initDb() {
-  const db = await getDb();
-  await db.exec(schema);
+  const db = getDb();
+  // Execute schema statements one by one (Turso requires individual statements)
+  const statements = schema
+    .split(';')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  for (const stmt of statements) {
+    await db.execute(stmt);
+  }
+}
+
+// ─── Helper: convert Turso ResultSet rows to plain objects ───────────────────
+function toRows(result: any): any[] {
+  return result.rows.map((row: any) => {
+    const obj: any = {};
+    result.columns.forEach((col: string, i: number) => {
+      obj[col] = row[i];
+    });
+    return obj;
+  });
 }
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
-
-// Serve uploads directory statically
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', message: 'Tutor Robot API is running' });
 });
 
-// ─── File Uploads ─────────────────────────────────────────────────────────────
-app.post('/api/v1/admin/upload', upload.single('file'), (req, res) => {
+// ─── File Uploads (Cloudinary) ────────────────────────────────────────────────
+app.post('/api/v1/admin/upload', upload.single('file'), (req: any, res: any) => {
   if (!req.file) {
     return res.status(400).json({ data: null, status: 400, error: 'No file uploaded' });
   }
-  
-  let urlPath = `/uploads/${req.file.filename}`;
-  if (req.file.mimetype.startsWith('video/')) {
-    urlPath = `/uploads/videos/${req.file.filename}`;
-  } else if (req.file.mimetype.startsWith('image/')) {
-    urlPath = `/uploads/images/${req.file.filename}`;
-  }
-  
-  res.json({ data: { url: `http://localhost:3000${urlPath}` }, status: 200, error: null });
+  const url = (req.file as any).path;
+  res.json({ data: { url }, status: 200, error: null });
 });
 
 // ─── GET Unified Content Tree (Student Portal) ────────────────────────────────
 app.get('/api/v1/content', async (req, res) => {
   try {
-    const db = await getDb();
+    const db = getDb();
     const statusFilter = req.query.status as string | undefined;
 
-    const grades = await db.all('SELECT * FROM grades ORDER BY id ASC');
-    const subjects = await db.all('SELECT * FROM subjects');
-    const topics = await db.all('SELECT * FROM topics');
+    const grades = toRows(await db.execute('SELECT * FROM grades ORDER BY id ASC'));
+    const subjects = toRows(await db.execute('SELECT * FROM subjects'));
+    const topics = toRows(await db.execute('SELECT * FROM topics'));
 
     const videoQuery = statusFilter
       ? 'SELECT * FROM videos WHERE status = ?'
@@ -81,9 +96,9 @@ app.get('/api/v1/content', async (req, res) => {
       : 'SELECT * FROM materials';
 
     const params = statusFilter ? [statusFilter] : [];
-    const videos = await db.all(videoQuery, params);
-    const quizzes = await db.all(quizQuery, params);
-    const materials = await db.all(materialQuery, params);
+    const videos = toRows(await db.execute({ sql: videoQuery, args: params }));
+    const quizzes = toRows(await db.execute({ sql: quizQuery, args: params }));
+    const materials = toRows(await db.execute({ sql: materialQuery, args: params }));
 
     const result = grades.map((g: any) => ({
       ...g,
@@ -100,8 +115,8 @@ app.get('/api/v1/content', async (req, res) => {
                 .filter((q: any) => q.topicId === t.id)
                 .map((q: any) => ({
                   ...q,
-                  options: q.options ? JSON.parse(q.options) : undefined,
-                  acceptedAnswers: q.acceptedAnswers ? JSON.parse(q.acceptedAnswers) : undefined,
+                  options: q.options ? JSON.parse(q.options as string) : undefined,
+                  acceptedAnswers: q.acceptedAnswers ? JSON.parse(q.acceptedAnswers as string) : undefined,
                 })),
               materials: materials.filter((m: any) => m.topicId === t.id),
             })),
@@ -120,19 +135,25 @@ app.get('/api/v1/content', async (req, res) => {
 
 // ─── GRADES ──────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/grades', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all('SELECT * FROM grades ORDER BY id ASC');
-  res.json({ data: rows, status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute('SELECT * FROM grades ORDER BY id ASC'));
+    res.json({ data: rows, status: 200, error: null });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/grades', async (req, res) => {
   try {
     const { id, title, isPremium } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const gradeId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run('INSERT INTO grades (id, title, isPremium, createdAt) VALUES (?, ?, ?, ?)',
-      gradeId, title, isPremium ? 1 : 0, createdAt);
+    await db.execute({
+      sql: 'INSERT INTO grades (id, title, isPremium, createdAt) VALUES (?, ?, ?, ?)',
+      args: [gradeId, title, isPremium ? 1 : 0, createdAt],
+    });
     res.json({ data: { id: gradeId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -142,9 +163,11 @@ app.post('/api/v1/admin/grades', async (req, res) => {
 app.put('/api/v1/admin/grades/:id', async (req, res) => {
   try {
     const { title, isPremium } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE grades SET title = ?, isPremium = ? WHERE id = ?',
-      title, isPremium ? 1 : 0, req.params.id);
+    const db = getDb();
+    await db.execute({
+      sql: 'UPDATE grades SET title = ?, isPremium = ? WHERE id = ?',
+      args: [title, isPremium ? 1 : 0, req.params.id],
+    });
     res.json({ data: { id: req.params.id }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -153,8 +176,8 @@ app.put('/api/v1/admin/grades/:id', async (req, res) => {
 
 app.delete('/api/v1/admin/grades/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM grades WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM grades WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -163,19 +186,25 @@ app.delete('/api/v1/admin/grades/:id', async (req, res) => {
 
 // ─── SUBJECTS ────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/subjects', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all('SELECT s.*, g.title as gradeTitle FROM subjects s JOIN grades g ON s.gradeId = g.id');
-  res.json({ data: rows, status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute('SELECT s.*, g.title as gradeTitle FROM subjects s JOIN grades g ON s.gradeId = g.id'));
+    res.json({ data: rows, status: 200, error: null });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/subjects', async (req, res) => {
   try {
     const { id, gradeId, title } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const subjectId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run('INSERT INTO subjects (id, gradeId, title, createdAt) VALUES (?, ?, ?, ?)',
-      subjectId, gradeId, title, createdAt);
+    await db.execute({
+      sql: 'INSERT INTO subjects (id, gradeId, title, createdAt) VALUES (?, ?, ?, ?)',
+      args: [subjectId, gradeId, title, createdAt],
+    });
     res.json({ data: { id: subjectId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -185,8 +214,11 @@ app.post('/api/v1/admin/subjects', async (req, res) => {
 app.put('/api/v1/admin/subjects/:id', async (req, res) => {
   try {
     const { title, gradeId } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE subjects SET title = ?, gradeId = ? WHERE id = ?', title, gradeId, req.params.id);
+    const db = getDb();
+    await db.execute({
+      sql: 'UPDATE subjects SET title = ?, gradeId = ? WHERE id = ?',
+      args: [title, gradeId, req.params.id],
+    });
     res.json({ data: { id: req.params.id }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -195,8 +227,8 @@ app.put('/api/v1/admin/subjects/:id', async (req, res) => {
 
 app.delete('/api/v1/admin/subjects/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM subjects WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM subjects WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -205,24 +237,30 @@ app.delete('/api/v1/admin/subjects/:id', async (req, res) => {
 
 // ─── TOPICS ──────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/topics', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all(`
-    SELECT t.*, s.title as subjectTitle, g.title as gradeTitle
-    FROM topics t
-    JOIN subjects s ON t.subjectId = s.id
-    JOIN grades g ON s.gradeId = g.id
-  `);
-  res.json({ data: rows, status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute(`
+      SELECT t.*, s.title as subjectTitle, g.title as gradeTitle
+      FROM topics t
+      JOIN subjects s ON t.subjectId = s.id
+      JOIN grades g ON s.gradeId = g.id
+    `));
+    res.json({ data: rows, status: 200, error: null });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/topics', async (req, res) => {
   try {
     const { id, subjectId, title } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const topicId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run('INSERT INTO topics (id, subjectId, title, createdAt) VALUES (?, ?, ?, ?)',
-      topicId, subjectId, title, createdAt);
+    await db.execute({
+      sql: 'INSERT INTO topics (id, subjectId, title, createdAt) VALUES (?, ?, ?, ?)',
+      args: [topicId, subjectId, title, createdAt],
+    });
     res.json({ data: { id: topicId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -232,8 +270,11 @@ app.post('/api/v1/admin/topics', async (req, res) => {
 app.put('/api/v1/admin/topics/:id', async (req, res) => {
   try {
     const { title, subjectId } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE topics SET title = ?, subjectId = ? WHERE id = ?', title, subjectId, req.params.id);
+    const db = getDb();
+    await db.execute({
+      sql: 'UPDATE topics SET title = ?, subjectId = ? WHERE id = ?',
+      args: [title, subjectId, req.params.id],
+    });
     res.json({ data: { id: req.params.id }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -242,8 +283,8 @@ app.put('/api/v1/admin/topics/:id', async (req, res) => {
 
 app.delete('/api/v1/admin/topics/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM topics WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM topics WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -252,28 +293,32 @@ app.delete('/api/v1/admin/topics/:id', async (req, res) => {
 
 // ─── VIDEOS ──────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/videos', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all(`
-    SELECT v.*, t.title as topicTitle, s.title as subjectTitle, g.title as gradeTitle,
-           s.id as subjectId, g.id as gradeId
-    FROM videos v
-    JOIN topics t ON v.topicId = t.id
-    JOIN subjects s ON t.subjectId = s.id
-    JOIN grades g ON s.gradeId = g.id
-  `);
-  res.json({ data: rows, status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute(`
+      SELECT v.*, t.title as topicTitle, s.title as subjectTitle, g.title as gradeTitle,
+             s.id as subjectId, g.id as gradeId
+      FROM videos v
+      JOIN topics t ON v.topicId = t.id
+      JOIN subjects s ON t.subjectId = s.id
+      JOIN grades g ON s.gradeId = g.id
+    `));
+    res.json({ data: rows, status: 200, error: null });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/videos', async (req, res) => {
   try {
     const { id, topicId, title, description, videoUrl, thumbnailUrl, duration, status } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const videoId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run(
-      'INSERT INTO videos (id, topicId, title, description, videoUrl, thumbnailUrl, duration, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      videoId, topicId, title, description, videoUrl, thumbnailUrl, duration, status || 'draft', createdAt
-    );
+    await db.execute({
+      sql: 'INSERT INTO videos (id, topicId, title, description, videoUrl, thumbnailUrl, duration, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [videoId, topicId, title, description ?? null, videoUrl ?? null, thumbnailUrl ?? null, duration ?? null, status || 'draft', createdAt],
+    });
     res.json({ data: { id: videoId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -283,11 +328,11 @@ app.post('/api/v1/admin/videos', async (req, res) => {
 app.put('/api/v1/admin/videos/:id', async (req, res) => {
   try {
     const { topicId, title, description, videoUrl, thumbnailUrl, duration } = req.body;
-    const db = await getDb();
-    await db.run(
-      'UPDATE videos SET topicId = ?, title = ?, description = ?, videoUrl = ?, thumbnailUrl = ?, duration = ? WHERE id = ?',
-      topicId, title, description, videoUrl, thumbnailUrl, duration, req.params.id
-    );
+    const db = getDb();
+    await db.execute({
+      sql: 'UPDATE videos SET topicId = ?, title = ?, description = ?, videoUrl = ?, thumbnailUrl = ?, duration = ? WHERE id = ?',
+      args: [topicId, title, description ?? null, videoUrl ?? null, thumbnailUrl ?? null, duration ?? null, req.params.id],
+    });
     res.json({ data: { id: req.params.id }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -297,8 +342,8 @@ app.put('/api/v1/admin/videos/:id', async (req, res) => {
 app.patch('/api/v1/admin/videos/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE videos SET status = ? WHERE id = ?', status, req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'UPDATE videos SET status = ? WHERE id = ?', args: [status, req.params.id] });
     res.json({ data: { id: req.params.id, status }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -307,8 +352,8 @@ app.patch('/api/v1/admin/videos/:id/status', async (req, res) => {
 
 app.delete('/api/v1/admin/videos/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM videos WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM videos WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -317,35 +362,45 @@ app.delete('/api/v1/admin/videos/:id', async (req, res) => {
 
 // ─── QUIZZES ─────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/quizzes', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all(`
-    SELECT q.*, t.title as topicTitle, s.id as subjectId, g.id as gradeId
-    FROM quizzes q
-    JOIN topics t ON q.topicId = t.id
-    JOIN subjects s ON t.subjectId = s.id
-    JOIN grades g ON s.gradeId = g.id
-  `);
-  res.json({ data: rows.map((r: any) => ({
-    ...r,
-    options: r.options ? JSON.parse(r.options) : undefined,
-    acceptedAnswers: r.acceptedAnswers ? JSON.parse(r.acceptedAnswers) : undefined,
-  })), status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute(`
+      SELECT q.*, t.title as topicTitle, s.id as subjectId, g.id as gradeId
+      FROM quizzes q
+      JOIN topics t ON q.topicId = t.id
+      JOIN subjects s ON t.subjectId = s.id
+      JOIN grades g ON s.gradeId = g.id
+    `));
+    res.json({
+      data: rows.map((r: any) => ({
+        ...r,
+        options: r.options ? JSON.parse(r.options as string) : undefined,
+        acceptedAnswers: r.acceptedAnswers ? JSON.parse(r.acceptedAnswers as string) : undefined,
+      })),
+      status: 200,
+      error: null,
+    });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/quizzes', async (req, res) => {
   try {
     const { id, topicId, questionType, question, options, correctAnswer, acceptedAnswers, status } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const quizId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run(
-      'INSERT INTO quizzes (id, topicId, questionType, question, options, correctAnswer, acceptedAnswers, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      quizId, topicId, questionType, question,
-      options ? JSON.stringify(options) : null,
-      correctAnswer || null,
-      acceptedAnswers ? JSON.stringify(acceptedAnswers) : null,
-      status || 'draft', createdAt
-    );
+    await db.execute({
+      sql: 'INSERT INTO quizzes (id, topicId, questionType, question, options, correctAnswer, acceptedAnswers, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [
+        quizId, topicId, questionType, question,
+        options ? JSON.stringify(options) : null,
+        correctAnswer || null,
+        acceptedAnswers ? JSON.stringify(acceptedAnswers) : null,
+        status || 'draft', createdAt,
+      ],
+    });
     res.json({ data: { id: quizId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -355,8 +410,8 @@ app.post('/api/v1/admin/quizzes', async (req, res) => {
 app.patch('/api/v1/admin/quizzes/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE quizzes SET status = ? WHERE id = ?', status, req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'UPDATE quizzes SET status = ? WHERE id = ?', args: [status, req.params.id] });
     res.json({ data: { id: req.params.id, status }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -365,8 +420,8 @@ app.patch('/api/v1/admin/quizzes/:id/status', async (req, res) => {
 
 app.delete('/api/v1/admin/quizzes/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM quizzes WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM quizzes WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -375,27 +430,31 @@ app.delete('/api/v1/admin/quizzes/:id', async (req, res) => {
 
 // ─── MATERIALS ────────────────────────────────────────────────────────────────
 app.get('/api/v1/admin/materials', async (req, res) => {
-  const db = await getDb();
-  const rows = await db.all(`
-    SELECT m.*, t.title as topicTitle, s.id as subjectId, g.id as gradeId
-    FROM materials m
-    JOIN topics t ON m.topicId = t.id
-    JOIN subjects s ON t.subjectId = s.id
-    JOIN grades g ON s.gradeId = g.id
-  `);
-  res.json({ data: rows, status: 200, error: null });
+  try {
+    const db = getDb();
+    const rows = toRows(await db.execute(`
+      SELECT m.*, t.title as topicTitle, s.id as subjectId, g.id as gradeId
+      FROM materials m
+      JOIN topics t ON m.topicId = t.id
+      JOIN subjects s ON t.subjectId = s.id
+      JOIN grades g ON s.gradeId = g.id
+    `));
+    res.json({ data: rows, status: 200, error: null });
+  } catch (err: any) {
+    res.status(500).json({ data: null, status: 500, error: err.message });
+  }
 });
 
 app.post('/api/v1/admin/materials', async (req, res) => {
   try {
     const { id, topicId, title, description, fileType, fileUrl, status } = req.body;
-    const db = await getDb();
+    const db = getDb();
     const materialId = id || uuidv4();
     const createdAt = new Date().toISOString().split('T')[0];
-    await db.run(
-      'INSERT INTO materials (id, topicId, title, description, fileType, fileUrl, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      materialId, topicId, title, description, fileType, fileUrl, status || 'draft', createdAt
-    );
+    await db.execute({
+      sql: 'INSERT INTO materials (id, topicId, title, description, fileType, fileUrl, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [materialId, topicId, title, description ?? null, fileType, fileUrl, status || 'draft', createdAt],
+    });
     res.json({ data: { id: materialId }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -405,8 +464,8 @@ app.post('/api/v1/admin/materials', async (req, res) => {
 app.patch('/api/v1/admin/materials/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const db = await getDb();
-    await db.run('UPDATE materials SET status = ? WHERE id = ?', status, req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'UPDATE materials SET status = ? WHERE id = ?', args: [status, req.params.id] });
     res.json({ data: { id: req.params.id, status }, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });
@@ -415,8 +474,8 @@ app.patch('/api/v1/admin/materials/:id/status', async (req, res) => {
 
 app.delete('/api/v1/admin/materials/:id', async (req, res) => {
   try {
-    const db = await getDb();
-    await db.run('DELETE FROM materials WHERE id = ?', req.params.id);
+    const db = getDb();
+    await db.execute({ sql: 'DELETE FROM materials WHERE id = ?', args: [req.params.id] });
     res.json({ data: null, status: 200, error: null });
   } catch (err: any) {
     res.status(500).json({ data: null, status: 500, error: err.message });

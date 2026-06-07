@@ -1,26 +1,21 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
-import path from 'path';
-import fs from 'fs';
+import { createClient, Client } from '@libsql/client';
 
-const dbDir = path.resolve(__dirname, '../../data');
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
+let dbInstance: Client | null = null;
 
-const dbPath = path.join(dbDir, 'tutor_robot.sqlite');
-
-let dbInstance: Database | null = null;
-
-export async function getDb(): Promise<Database> {
+export function getDb(): Client {
   if (dbInstance) return dbInstance;
-  
-  dbInstance = await open({
-    filename: dbPath,
-    driver: sqlite3.Database
+
+  const url = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (!url) {
+    throw new Error('TURSO_DATABASE_URL environment variable is not set');
+  }
+
+  dbInstance = createClient({
+    url,
+    authToken,
   });
-  
-  await dbInstance.exec('PRAGMA foreign_keys = ON');
-  
+
   return dbInstance;
 }
