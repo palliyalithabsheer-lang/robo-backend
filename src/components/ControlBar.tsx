@@ -26,16 +26,16 @@ const ControlBar = ({ onUp, onDown, onLeft, onRight, onSelect, centerLabel }: Co
 
   return (
     <div className="control-bar">
-      <button className="nav-btn left-btn" aria-label="Left" onClick={onLeft}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-      </button>
-
-      <div className="center-btns">
+      <div className="control-pad">
         <button className="nav-btn up-btn" aria-label="Up" onClick={onUp}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="18 15 12 9 6 15" />
+          </svg>
+        </button>
+
+        <button className="nav-btn left-btn" aria-label="Left" onClick={onLeft}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
 
@@ -47,18 +47,18 @@ const ControlBar = ({ onUp, onDown, onLeft, onRight, onSelect, centerLabel }: Co
           {centerLabel}
         </button>
 
+        <button className="nav-btn right-btn" aria-label="Right" onClick={onRight}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+
         <button className="nav-btn down-btn" aria-label="Down" onClick={onDown}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
       </div>
-
-      <button className="nav-btn right-btn" aria-label="Right" onClick={onRight}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </button>
     </div>
   );
 };
