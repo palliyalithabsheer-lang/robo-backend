@@ -1,0 +1,133 @@
+.eye-section {
+  height: 20%;
+  background-color: #1a1a2e; /* Dark eye area */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  border-bottom: 2px solid #0f0f1c;
+  overflow: hidden;
+  position: relative;
+}
+
+.eye {
+  width: 60px;
+  height: 80px;
+  background-color: #00f0ff; /* Glowing bright cyan eyes */
+  border-radius: 50% 50% 40% 40%;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pupil {
+  width: 25px;
+  height: 35px;
+  background-color: #1a1a2e;
+  border-radius: 50%;
+  position: absolute;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Blinking */
+.eye.blink {
+  height: 4px !important;
+  margin-top: 38px;
+  margin-bottom: 38px;
+  background-color: #00f0ff;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 240, 255, 0.4);
+}
+.eye.blink .pupil {
+  display: none;
+}
+
+/* Robot States */
+
+/* Idle */
+.eye-state-idle {
+  /* Default styling applies */
+}
+
+/* Listening */
+.eye-state-listening .pupil {
+  animation: pulse-pupil 1.5s infinite;
+}
+
+@keyframes pulse-pupil {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Thinking (Looking up and right) */
+.eye-state-thinking .pupil {
+  transform: translate(12px, -18px);
+}
+.eye-state-thinking {
+  height: 75px;
+}
+
+/* Correct (Happy squint) */
+.eye-state-correct {
+  border-radius: 50% 50% 0 0;
+  border-bottom: 8px solid #00f0ff;
+  height: 45px;
+  margin-top: 15px;
+  background-color: transparent;
+  box-shadow: none;
+}
+.eye-state-correct .pupil {
+  display: none;
+}
+
+/* Incorrect (Confused / Crooked) */
+.eye:nth-child(1).eye-state-incorrect {
+  height: 50px;
+  border-radius: 40% 40% 50% 50%;
+}
+.eye:nth-child(2).eye-state-incorrect {
+  height: 80px;
+}
+.eye-state-incorrect .pupil {
+  transform: translate(-5px, 10px);
+}
+.eye:nth-child(2).eye-state-incorrect .pupil {
+  transform: translate(5px, -10px);
+}
+
+/* Completed (Spinning / Excited) */
+.eye-state-completed {
+  animation: excited-spin 2s ease-out;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+}
+.eye-state-completed .pupil {
+  width: 40px;
+  height: 40px;
+  background-color: #00f0ff; /* Invert */
+}
+.eye-state-completed {
+  background-color: #1a1a2e;
+  border: 4px solid #00f0ff;
+}
+
+@keyframes excited-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Video Mode (Attentive) */
+.eye-state-video {
+  height: 90px;
+  width: 65px;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+}
+.eye-state-video .pupil {
+  transform: scale(1.1);
+}

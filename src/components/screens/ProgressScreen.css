@@ -1,0 +1,97 @@
+.progress-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.progress-title {
+  font-size: 1.2rem;
+  color: #2b2d42;
+  margin: 0 0 10px 0;
+  text-align: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.overall-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff3cd;
+  padding: 15px;
+  border-radius: 12px;
+  border: 2px solid #ffeeba;
+  margin-bottom: 15px;
+}
+
+.percentage {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #856404;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  color: #856404;
+  font-weight: bold;
+}
+
+.progress-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 5px;
+}
+
+.subject-section {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  padding: 10px;
+}
+
+.subject-title {
+  font-size: 1rem;
+  color: #495057;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 5px;
+}
+
+.topic-progress-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e9ecef;
+}
+
+.topic-progress-item:last-child {
+  border-bottom: none;
+}
+
+.topic-name {
+  font-size: 0.9rem;
+  color: #2b2d42;
+  flex: 1;
+}
+
+.topic-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-badge {
+  font-size: 1rem;
+}
+
+.quiz-badge {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #007bff;
+}

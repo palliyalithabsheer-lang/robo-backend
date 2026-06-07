@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --sidebar-w: 240px;
+  --topbar-h: 64px;
+
+  /* Colors */
+  --color-sidebar-bg:    #0f172a;
+  --color-sidebar-text:  rgba(255,255,255,0.65);
+  --color-sidebar-hover: rgba(255,255,255,0.08);
+  --color-sidebar-active-bg: rgba(99,102,241,0.2);
+  --color-sidebar-active: #818cf8;
+  --color-sidebar-border: rgba(255,255,255,0.06);
+
+  --color-topbar-bg:    #ffffff;
+  --color-topbar-border: #f1f5f9;
+
+  --color-bg:           #f8fafc;
+  --color-card:         #ffffff;
+  --color-border:       #e2e8f0;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-muted:   #94a3b8;
+
+  --color-primary:      #6366f1;
+  --color-primary-soft: #eef2ff;
+  --color-green:        #10b981;
+  --color-green-soft:   #ecfdf5;
+  --color-amber:        #f59e0b;
+  --color-amber-soft:   #fffbeb;
+  --color-red:          #ef4444;
+  --color-red-soft:     #fef2f2;
+  --color-blue:         #3b82f6;
+  --color-blue-soft:    #eff6ff;
+  --color-purple:       #8b5cf6;
+  --color-purple-soft:  #f5f3ff;
+  --color-teal:         #14b8a6;
+  --color-teal-soft:    #f0fdfa;
+  --color-orange:       #f97316;
+  --color-orange-soft:  #fff7ed;
+
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg:  0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }

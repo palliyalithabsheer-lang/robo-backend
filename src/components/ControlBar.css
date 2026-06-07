@@ -1,0 +1,134 @@
+.control-bar {
+  height: 15%;
+  background: linear-gradient(to top, #1a1a2e, #2b2d42);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 14px;
+  box-sizing: border-box;
+}
+
+.center-btns {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── D-pad nav buttons ──────────────────────────────────────────────────── */
+.nav-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: rgba(255,255,255,0.75);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-btn:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-1px);
+}
+
+.nav-btn:active {
+  transform: translateY(1px);
+  background: rgba(255,255,255,0.06);
+}
+
+.left-btn, .right-btn {
+  margin-top: 50px; /* Align vertically with select button */
+}
+
+/* ── Dynamic CENTER button ──────────────────────────────────────────────── */
+.select-btn {
+  border: none;
+  border-radius: 22px;
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  min-width: 78px;
+  min-height: 42px;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  text-transform: uppercase;
+}
+
+.select-btn:active {
+  transform: scale(0.93);
+}
+
+/* Color variants by state */
+.center-default, .center-select {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.4);
+}
+
+.center-submit {
+  background: linear-gradient(135deg, #17a2b8, #0f7285);
+  color: white;
+  box-shadow: 0 4px 12px rgba(23,162,184,0.4);
+}
+
+.center-record {
+  background: linear-gradient(135deg, #9b59b6, #7d3c98);
+  color: white;
+  box-shadow: 0 4px 12px rgba(155,89,182,0.4);
+}
+
+.center-stop {
+  background: linear-gradient(135deg, #dc3545, #a71d2a);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220,53,69,0.5);
+  animation: pulse-stop 1s ease-in-out infinite;
+}
+
+@keyframes pulse-stop {
+  0%, 100% { box-shadow: 0 4px 12px rgba(220,53,69,0.5); }
+  50% { box-shadow: 0 4px 20px rgba(220,53,69,0.85); }
+}
+
+.center-next {
+  background: linear-gradient(135deg, #28a745, #1a7a30);
+  color: white;
+  box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+}
+
+.center-finish {
+  background: linear-gradient(135deg, #ffc107, #d39e00);
+  color: #1a1a2e;
+  box-shadow: 0 4px 12px rgba(255,193,7,0.4);
+}
+
+.center-play {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: white;
+  box-shadow: 0 4px 12px rgba(17,153,142,0.4);
+}
+
+.center-pause {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+  color: #1a1a2e;
+  box-shadow: 0 4px 12px rgba(247,151,30,0.4);
+}
+
+.center-back {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8);
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.2);
+}

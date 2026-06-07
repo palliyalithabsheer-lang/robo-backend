@@ -1,0 +1,186 @@
+.dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  backdrop-filter: blur(8px);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h2 {
+  font-size: 1.2rem;
+  color: #2b2d42;
+  margin: 0;
+}
+
+.close-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #6c757d;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover { background: #e9ecef; }
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: white;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Subscriptions */
+.subscription-section h3,
+.progress-detail h3 {
+  font-size: 0.95rem;
+  color: #495057;
+  margin: 0 0 10px 0;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 6px;
+}
+
+.grade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grade-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.grade-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.grade-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #2b2d42;
+}
+
+.grade-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.badge-free { background: #d4edda; color: #155724; }
+.badge-premium { background: #fff3cd; color: #856404; }
+
+.unlock-btn {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.unlock-btn:hover { opacity: 0.9; transform: scale(1.03); }
+
+/* Progress Detail */
+.subject-block {
+  margin-bottom: 12px;
+}
+
+.subject-block-title {
+  font-size: 0.8rem;
+  color: #007bff;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.no-content {
+  font-size: 0.78rem;
+  color: #adb5bd;
+  margin: 0;
+}
+
+.topic-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  padding: 5px 0;
+  border-bottom: 1px dashed #e9ecef;
+}
+
+.topic-row-name { color: #2b2d42; }
+.topic-row-stat { color: #495057; }
+
+.dashboard-footer {
+  text-align: center;
+  font-size: 0.72rem;
+  color: #adb5bd;
+  padding-top: 4px;
+  border-top: 1px solid #e9ecef;
+}

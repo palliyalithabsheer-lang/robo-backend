@@ -1,0 +1,116 @@
+.parent-auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+}
+
+.parent-auth-card {
+  background: #1e1e3a;
+  border: 2px solid #00f0ff;
+  border-radius: 20px;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 280px;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+  transition: transform 0.1s;
+}
+
+.parent-auth-card.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.auth-title {
+  font-size: 1.3rem;
+  color: #00f0ff;
+  margin: 0;
+}
+
+.auth-subtitle {
+  font-size: 0.85rem;
+  color: #adb5bd;
+  margin: 0;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 14px;
+  margin: 6px 0;
+}
+
+.pin-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #00f0ff;
+  transition: background 0.2s;
+}
+
+.pin-dot.filled {
+  background: #00f0ff;
+  box-shadow: 0 0 8px rgba(0,240,255,0.8);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.key {
+  background: #2a2a4a;
+  color: #f1f3f5;
+  border: 1px solid #3a3a5a;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.key:hover { background: #3a3a6a; }
+.key:active { transform: scale(0.93); }
+
+.key-delete {
+  color: #ff6b6b;
+  border-color: #ff6b6b44;
+}
+
+.key-empty {
+  background: transparent;
+  border: none;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #adb5bd;
+  border-radius: 20px;
+  padding: 8px 28px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.cancel-btn:hover { border-color: #adb5bd; }
+
+.auth-hint {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin: 0;
+}
