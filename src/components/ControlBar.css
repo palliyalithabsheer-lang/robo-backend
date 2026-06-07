@@ -1,15 +1,15 @@
 .control-bar {
-  flex: 0 0 auto;
+  flex: 0 0 15%; /* Restored exactly to original 15% size */
   background: linear-gradient(to top, #11111a, #1a1a2e);
   border-top: 1px solid rgba(255,255,255,0.08);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px 10px 24px 10px; /* Extra padding at bottom for rounded corner */
   box-sizing: border-box;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
   position: relative;
   z-index: 10;
+  overflow: hidden;
 }
 
 .control-pad {
@@ -19,6 +19,7 @@
   gap: 12px 20px;
   align-items: center;
   justify-items: center;
+  transform: scale(0.65); /* Scale down the beautiful UI to fit exactly inside the 15% height */
 }
 
 /* Perfect alignment via Grid */

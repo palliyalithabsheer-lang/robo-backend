@@ -1,7 +1,8 @@
 .stomach-section {
-  flex: 1 1 auto;
+  flex: 0 0 65%; /* Restored to exactly 65% */
   height: 0; /* Required for nested scrolling in flex containers */
-  background-color: #f8f9fa; /* Light stomach area */
+  background-color: #f8f9fa;
+  /* Light stomach area */
   display: flex;
   justify-content: center;
   align-items: center;

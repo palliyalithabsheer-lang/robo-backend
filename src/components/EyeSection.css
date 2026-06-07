@@ -1,7 +1,7 @@
 .eye-section {
-  flex: 0 0 auto;
-  height: 140px; /* Fixed height for consistency */
-  background-color: #1a1a2e; /* Dark eye area */
+  flex: 0 0 20%;
+  background-color: #1a1a2e;
+  /* Dark eye area */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,13 +9,14 @@
   border-bottom: 2px solid #0f0f1c;
   overflow: hidden;
   position: relative;
-  border-radius: 36px 36px 0 0; /* Match device curve */
+  border-radius: 36px 36px 0 0;
 }
 
 .eye {
   width: 60px;
   height: 80px;
-  background-color: #00f0ff; /* Glowing bright cyan eyes */
+  background-color: #00f0ff;
+  /* Glowing bright cyan eyes */
   border-radius: 50% 50% 40% 40%;
   position: relative;
   box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
@@ -43,6 +44,7 @@
   border-radius: 10px;
   box-shadow: 0 0 5px rgba(0, 240, 255, 0.4);
 }
+
 .eye.blink .pupil {
   display: none;
 }
@@ -60,15 +62,24 @@
 }
 
 @keyframes pulse-pupil {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Thinking (Looking up and right) */
 .eye-state-thinking .pupil {
   transform: translate(12px, -18px);
 }
+
 .eye-state-thinking {
   height: 75px;
 }
@@ -82,6 +93,7 @@
   background-color: transparent;
   box-shadow: none;
 }
+
 .eye-state-correct .pupil {
   display: none;
 }
@@ -91,12 +103,15 @@
   height: 50px;
   border-radius: 40% 40% 50% 50%;
 }
+
 .eye:nth-child(2).eye-state-incorrect {
   height: 80px;
 }
+
 .eye-state-incorrect .pupil {
   transform: translate(-5px, 10px);
 }
+
 .eye:nth-child(2).eye-state-incorrect .pupil {
   transform: translate(5px, -10px);
 }
@@ -108,20 +123,31 @@
   width: 70px;
   height: 70px;
 }
+
 .eye-state-completed .pupil {
   width: 40px;
   height: 40px;
-  background-color: #00f0ff; /* Invert */
+  background-color: #00f0ff;
+  /* Invert */
 }
+
 .eye-state-completed {
   background-color: #1a1a2e;
   border: 4px solid #00f0ff;
 }
 
 @keyframes excited-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.2); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 /* Video Mode (Attentive) */
@@ -130,6 +156,7 @@
   width: 65px;
   box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
 }
+
 .eye-state-video .pupil {
   transform: scale(1.1);
 }
