@@ -5,7 +5,6 @@ import { getDb } from './db/db';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { schema } from './db/schema';
 
 // ─── Cloudinary Configuration ─────────────────────────────────────────────────
@@ -15,21 +14,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: async (req: any, file: any) => {
-    const isVideo = file.mimetype.startsWith('video/');
-    return {
-      folder: isVideo ? 'robo/videos' : 'robo/images',
-      resource_type: isVideo ? 'video' : 'image',
-      allowed_formats: isVideo
-        ? ['mp4', 'mov', 'avi', 'mkv', 'webm']
-        : ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    };
-  },
-});
-
-const upload = multer({ storage: cloudinaryStorage });
+// Use memory storage — files are uploaded directly to Cloudinary via stream
+const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -66,13 +52,25 @@ app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', message: 'Tutor Robot API is running' });
 });
 
-// ─── File Uploads (Cloudinary) ────────────────────────────────────────────────
+// ─── File Uploads (Cloudinary via stream) ────────────────────────────────────
 app.post('/api/v1/admin/upload', upload.single('file'), (req: any, res: any) => {
   if (!req.file) {
     return res.status(400).json({ data: null, status: 400, error: 'No file uploaded' });
   }
-  const url = (req.file as any).path;
-  res.json({ data: { url }, status: 200, error: null });
+  const isVideo = req.file.mimetype.startsWith('video/');
+  const folder = isVideo ? 'robo/videos' : 'robo/images';
+  const resourceType = isVideo ? 'video' : 'image';
+
+  const uploadStream = cloudinary.uploader.upload_stream(
+    { folder, resource_type: resourceType },
+    (error: any, result: any) => {
+      if (error || !result) {
+        return res.status(500).json({ data: null, status: 500, error: error?.message || 'Upload failed' });
+      }
+      res.json({ data: { url: result.secure_url }, status: 200, error: null });
+    }
+  );
+  uploadStream.end(req.file.buffer);
 });
 
 // ─── GET Unified Content Tree (Student Portal) ────────────────────────────────
