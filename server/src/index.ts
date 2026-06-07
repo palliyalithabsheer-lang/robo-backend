@@ -27,10 +27,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ─── Initialize Database on startup ──────────────────────────────────────────
+import { schema } from './db/schema';
 async function initDb() {
   const db = await getDb();
-  const schemaPath = path.resolve(__dirname, 'db/schema.sql');
-  const schema = fs.readFileSync(schemaPath, 'utf-8');
   await db.exec(schema);
 }
 

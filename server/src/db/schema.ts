@@ -1,3 +1,4 @@
+export const schema = `
 CREATE TABLE IF NOT EXISTS grades (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -58,3 +59,4 @@ CREATE TABLE IF NOT EXISTS materials (
   createdAt TEXT NOT NULL,
   FOREIGN KEY (topicId) REFERENCES topics (id) ON DELETE CASCADE
 );
+`;

@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getDb } from './db';
-
-const schemaPath = path.resolve(__dirname, 'schema.sql');
+import { schema } from './schema';
 
 const mockDataPath = path.resolve(__dirname, '../../../admin/src/data/mockData.ts');
 
@@ -11,7 +10,7 @@ async function init() {
   const db = await getDb();
   
   // Read and execute schema
-  const schema = fs.readFileSync(schemaPath, 'utf-8');
+
   await db.exec(schema);
   console.log('Schema created.');
 
