@@ -1,72 +1,55 @@
-/* ── ProgressScreen — Premium Robot UI ─────────────────────────── */
+/* ── ProgressScreen — Clean Minimal Light UI ───────────────────── */
 .progress-screen {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 14px 12px 10px;
+  padding: 16px 14px 10px;
   box-sizing: border-box;
-  background: linear-gradient(160deg, #0d0d1a 0%, #1a1a3e 60%, #0f1a2e 100%);
-  font-family: 'Outfit', sans-serif;
-  color: #fff;
+  background: #f5f7ff;
+  font-family: 'Outfit', 'Inter', sans-serif;
 }
 
 .progress-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #00f0ff;
-  margin: 0 0 12px 0;
+  color: #3a3d5c;
+  margin: 0 0 14px 0;
   text-align: center;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.progress-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00f0ff, transparent);
-  border-radius: 2px;
+  opacity: 0.85;
 }
 
 .overall-progress {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 120, 0, 0.1));
-  border: 1px solid rgba(255, 193, 7, 0.35);
-  padding: 12px;
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border: 1.5px solid #ffe082;
+  padding: 14px;
   border-radius: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 20px rgba(255, 165, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: 0 4px 14px rgba(255, 193, 7, 0.12);
 }
 
 .percentage {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ffd700, #ff9500);
+  background: linear-gradient(135deg, #f59e0b, #f97316);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.1;
-  text-shadow: none;
-  filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.4));
+  line-height: 1;
 }
 
 .progress-label {
-  font-size: 0.78rem;
-  color: rgba(255, 200, 60, 0.85);
+  font-size: 0.75rem;
+  color: #b45309;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .progress-list {
@@ -75,66 +58,61 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 2px;
+  padding: 2px 1px 4px;
   scrollbar-width: none;
 }
 .progress-list::-webkit-scrollbar { display: none; }
 
 .subject-section {
-  background: rgba(255, 255, 255, 0.04);
+  background: #fff;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1.5px solid #e8eaf6;
   padding: 10px 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(90, 100, 180, 0.06);
 }
 
 .subject-title {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #00f0ff;
+  color: #7c83f0;
   margin: 0 0 8px 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+  border-bottom: 1.5px solid #eef0fd;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 
 .topic-progress-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 5px 0;
+  border-bottom: 1px solid #f3f4f9;
 }
 
-.topic-progress-item:last-child {
-  border-bottom: none;
-}
+.topic-progress-item:last-child { border-bottom: none; }
 
 .topic-name {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: #4b5068;
   flex: 1;
   font-weight: 500;
 }
 
 .topic-stats {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
-.stat-badge {
-  font-size: 0.9rem;
-}
+.stat-badge { font-size: 0.9rem; }
 
 .quiz-badge {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: #7c83f0;
+  background: #eef0fd;
+  border: 1px solid #c5caf5;
   border-radius: 20px;
   padding: 1px 7px;
 }

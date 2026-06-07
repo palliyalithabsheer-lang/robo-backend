@@ -1,40 +1,24 @@
-/* ── MenuScreen — Premium Robot UI ─────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap');
-
+/* ── MenuScreen — Clean Minimal Light UI ───────────────────────── */
 .menu-screen {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 14px 12px 10px;
+  padding: 16px 14px 10px;
   box-sizing: border-box;
-  background: linear-gradient(160deg, #0d0d1a 0%, #1a1a3e 60%, #0f1a2e 100%);
-  font-family: 'Outfit', sans-serif;
+  background: #f5f7ff;
+  font-family: 'Outfit', 'Inter', sans-serif;
 }
 
 .menu-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #00f0ff;
-  margin: 0 0 12px 0;
+  color: #3a3d5c;
+  margin: 0 0 14px 0;
   text-align: center;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.menu-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00f0ff, transparent);
-  border-radius: 2px;
+  opacity: 0.85;
 }
 
 .menu-list {
@@ -42,50 +26,44 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 2px 2px 4px;
+  gap: 9px;
+  padding: 2px 1px 4px;
   scrollbar-width: none;
 }
 .menu-list::-webkit-scrollbar { display: none; }
 
 .menu-item {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(8px);
-  padding: 13px 16px;
+  background: #ffffff;
+  padding: 13px 18px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1.5px solid #e8eaf6;
   text-align: center;
   font-size: 0.95rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
-  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-weight: 500;
+  color: #555a7a;
+  transition: all 0.2s ease;
   cursor: pointer;
-  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(90, 100, 180, 0.06);
 }
 
 .menu-item:hover {
-  background: rgba(0, 240, 255, 0.07);
-  border-color: rgba(0, 240, 255, 0.25);
-  color: #fff;
+  border-color: #c5caf5;
+  color: #3a3d5c;
+  box-shadow: 0 4px 14px rgba(90, 100, 180, 0.12);
 }
 
 .menu-item.selected {
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.25), rgba(0, 240, 255, 0.15));
-  border-color: #00f0ff;
-  color: #fff;
+  background: linear-gradient(135deg, #eef1ff, #e6eaff);
+  border-color: #7c83f0;
+  color: #3a3d5c;
   font-weight: 700;
-  box-shadow:
-    0 0 0 1px rgba(0, 240, 255, 0.3),
-    0 4px 20px rgba(0, 123, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateX(3px);
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 4px 16px rgba(124, 131, 240, 0.22);
+  transform: translateX(4px);
 }
 
 .empty-state {
   text-align: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: #adb5bd;
   margin-top: 30px;
-  font-size: 0.9rem;
-  letter-spacing: 0.05em;
+  font-size: 0.875rem;
 }

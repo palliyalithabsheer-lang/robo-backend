@@ -1,4 +1,4 @@
-/* ── LockedScreen — Premium Robot UI ───────────────────────────── */
+/* ── LockedScreen — Clean Minimal Light UI ─────────────────────── */
 .locked-screen {
   width: 100%;
   height: 100%;
@@ -7,17 +7,16 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 20px;
+  padding: 24px;
   box-sizing: border-box;
-  background: linear-gradient(160deg, #0d0d1a 0%, #1a1a3e 60%, #0f1a2e 100%);
-  font-family: 'Outfit', sans-serif;
+  background: #f5f7ff;
+  font-family: 'Outfit', 'Inter', sans-serif;
   text-align: center;
 }
 
 .lock-icon {
-  font-size: 3.5rem;
+  font-size: 3.2rem;
   animation: float-lock 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 14px rgba(255, 165, 0, 0.6));
 }
 
 @keyframes float-lock {
@@ -26,43 +25,42 @@
 }
 
 .locked-title {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: #fff;
+  color: #3a3d5c;
   margin: 4px 0 0;
-  letter-spacing: 0.05em;
 }
 
 .locked-msg {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: rgba(255, 193, 7, 0.9);
+  color: #f97316;
   margin: 0;
 }
 
 .locked-sub {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: #9ca3af;
   margin: 0;
 }
 
 .back-btn {
-  margin-top: 12px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.8);
+  margin-top: 14px;
+  background: #fff;
+  border: 1.5px solid #c5caf5;
+  color: #7c83f0;
   border-radius: 20px;
-  padding: 8px 22px;
+  padding: 8px 24px;
   font-size: 0.85rem;
   font-weight: 600;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(124, 131, 240, 0.1);
 }
 
 .back-btn:hover {
-  background: rgba(0, 240, 255, 0.1);
-  border-color: #00f0ff;
-  color: #00f0ff;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  background: #eef0fd;
+  border-color: #7c83f0;
+  box-shadow: 0 4px 14px rgba(124, 131, 240, 0.2);
 }
