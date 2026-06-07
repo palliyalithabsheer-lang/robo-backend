@@ -1,5 +1,5 @@
 .stomach-section {
-  flex: 0 0 65%; /* Restored to exactly 65% */
+  flex: 0 0 60%; /* Adjusted to 60% since ControlBar is now 20% */
   height: 0; /* Required for nested scrolling in flex containers */
   background-color: #f8f9fa;
   /* Light stomach area */

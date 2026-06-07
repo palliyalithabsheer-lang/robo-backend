@@ -1,5 +1,5 @@
 .control-bar {
-  flex: 0 0 15%; /* Restored exactly to original 15% size */
+  flex: 0 0 20%; /* Expanded to 20% per user request */
   background: linear-gradient(to top, #11111a, #1a1a2e);
   border-top: 1px solid rgba(255,255,255,0.08);
   display: flex;
@@ -14,19 +14,20 @@
 
 .control-pad {
   display: grid;
-  grid-template-columns: 48px auto 48px;
-  grid-template-rows: 48px 48px 48px;
-  gap: 12px 20px;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr auto 1fr;
+  width: 100%;
+  height: 100%;
+  padding: 15px; /* Ensures buttons don't touch the absolute edges */
   align-items: center;
   justify-items: center;
-  transform: scale(0.65); /* Scale down the beautiful UI to fit exactly inside the 15% height */
 }
 
-/* Perfect alignment via Grid */
-.up-btn { grid-column: 2; grid-row: 1; }
-.down-btn { grid-column: 2; grid-row: 3; }
-.left-btn { grid-column: 1; grid-row: 2; }
-.right-btn { grid-column: 3; grid-row: 2; }
+/* Spread alignment via Grid */
+.up-btn { grid-column: 2; grid-row: 1; align-self: start; }
+.down-btn { grid-column: 2; grid-row: 3; align-self: end; }
+.left-btn { grid-column: 1; grid-row: 2; justify-self: start; margin-left: 10px; }
+.right-btn { grid-column: 3; grid-row: 2; justify-self: end; margin-right: 10px; }
 .select-btn { grid-column: 2; grid-row: 2; }
 
 /* ── D-pad nav buttons ──────────────────────────────────────────────────── */
